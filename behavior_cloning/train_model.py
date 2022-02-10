@@ -72,7 +72,8 @@ def main():
             loss.backward()
             optimizer.step()
         scheduler.step()
-        print(epoch, loss.item())
+        if epoch % 100 == 0:
+            print(epoch, loss.item())
     torch.save(model.state_dict(), "bc_weights")
 
 
