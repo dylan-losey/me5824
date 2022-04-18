@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 
 
 
-N = 100             # number of demonstrations
+N = 3             # number of demonstrations
 sigma_h = 0.1      # amount of noise in the demonstration
 T = 10              # each demonstration has T timesteps
 D = []
