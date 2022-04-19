@@ -3,6 +3,9 @@ import numpy as np
 from scipy.optimize import minimize, LinearConstraint, NonlinearConstraint
 
 
+
+### Create a class to perform the trajectory optimization ###
+
 class TrajOpt(object):
 
     def __init__(self):
@@ -44,7 +47,8 @@ class TrajOpt(object):
         return xi, res
 
 
-# here is the code to run our trajopt
+### Run the trajectory optimizer ###
+
 trajopt = TrajOpt()
 xi, res = trajopt.optimize()
 print(xi)

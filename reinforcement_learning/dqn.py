@@ -60,9 +60,9 @@ class Agent():
         self.seed = random.seed(seed)
 
         # Q-Network
-        self.qnetwork_local = QNetwork(state_size, action_size, seed).to(device)
+        self.qnetwork_theta = QNetwork(state_size, action_size, seed).to(device)
         self.qnetwork_target = QNetwork(state_size, action_size, seed).to(device)
-        self.optimizer = optim.Adam(self.qnetwork_local.parameters(), lr=LR)
+        self.optimizer = optim.Adam(self.qnetwork_theta.parameters(), lr=LR)
 
         # Replay memory
         self.memory = ReplayBuffer(action_size, BUFFER_SIZE, BATCH_SIZE, seed)
@@ -90,10 +90,10 @@ class Agent():
             eps (float): epsilon, for epsilon-greedy action selection
         """
         state = torch.from_numpy(state).float().unsqueeze(0).to(device)
-        self.qnetwork_local.eval()
+        self.qnetwork_theta.eval()
         with torch.no_grad():
-            action_values = self.qnetwork_local(state)
-        self.qnetwork_local.train()
+            action_values = self.qnetwork_theta(state)
+        self.qnetwork_theta.train()
 
         # Epsilon-greedy action selection
         if random.random() > eps:
@@ -115,8 +115,8 @@ class Agent():
         # Compute Q targets for current states
         Q_targets = rewards + (gamma * Q_targets_next * (1 - dones))
 
-        # Get expected Q values from local model
-        Q_expected = self.qnetwork_local(states).gather(1, actions)
+        # Get expected Q values from theta model
+        Q_expected = self.qnetwork_theta(states).gather(1, actions)
 
         # Compute loss
         loss = F.mse_loss(Q_expected, Q_targets)
@@ -126,19 +126,19 @@ class Agent():
         self.optimizer.step()
 
         # ------------------- update target network ------------------- #
-        self.soft_update(self.qnetwork_local, self.qnetwork_target, TAU)
+        self.soft_update(self.qnetwork_theta, self.qnetwork_target, TAU)
 
-    def soft_update(self, local_model, target_model, tau):
+    def soft_update(self, theta_model, target_model, tau):
         """Soft update model parameters.
-        θ_target = τ*θ_local + (1 - τ)*θ_target
+        θ_target = τ*θ_theta + (1 - τ)*θ_target
         Params
         ======
-            local_model (PyTorch model): weights will be copied from
+            theta_model (PyTorch model): weights will be copied from
             target_model (PyTorch model): weights will be copied to
             tau (float): interpolation parameter
         """
-        for target_param, local_param in zip(target_model.parameters(), local_model.parameters()):
-            target_param.data.copy_(tau*local_param.data + (1.0-tau)*target_param.data)
+        for target_param, theta_param in zip(target_model.parameters(), theta_model.parameters()):
+            target_param.data.copy_(tau*theta_param.data + (1.0-tau)*target_param.data)
 
 
 class ReplayBuffer:
